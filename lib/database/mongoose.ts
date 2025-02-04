@@ -9,7 +9,6 @@ interface MongooseConnection {
 
 // Extend the global object to include mongoose caching
 declare global {
-  // eslint-disable-next-line no-var
   var mongoose: MongooseConnection | undefined;
 }
 
@@ -20,7 +19,10 @@ if (!cached) {
 }
 
 export const connectToDatabase = async () => {
-  if (cached.conn) return cached.conn;
+  if (cached.conn) {
+    console.log('Already connected to MongoDB.');
+    return cached.conn;
+  }
 
   if (!MONGODB_URL) throw new Error('Missing MONGODB_URL');
 
@@ -33,5 +35,20 @@ export const connectToDatabase = async () => {
 
   cached.conn = await cached.promise;
 
+  console.log('Connected to MongoDB:', mongoose.connection.readyState === 1 ? '✅' : '❌');
+  
   return cached.conn;
+};
+
+// Function to check connection status
+export const checkConnectionStatus = () => {
+  const status = mongoose.connection.readyState;
+  const statusMessages: Record<number, string> = {
+    0: 'Disconnected ❌',
+    1: 'Connected ✅',
+    2: 'Connecting ⏳',
+    3: 'Disconnecting 🔄',
+  };
+
+  console.log('MongoDB Connection Status:', statusMessages[status] || 'Unknown');
 };
