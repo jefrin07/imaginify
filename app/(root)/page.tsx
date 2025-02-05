@@ -5,9 +5,8 @@ import Image from "next/image"
 import Link from "next/link"
 
 const Home = async ({ searchParams }: SearchParamProps) => {
-  // Await the searchParams
-  const { page = "1", query = "" } = await searchParams; // Ensure it’s awaited and destructured
-  
+  const { page = "1", query = "" } = searchParams;
+
   const pageNumber = Number(page);
   const searchQuery = query as string || '';
 

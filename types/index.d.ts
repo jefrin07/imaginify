@@ -114,10 +114,9 @@ declare type CreateUserParams = {
   };
   
   declare type SearchParamProps = {
-    params: { id: string; type: TransformationTypeKey }; // Ensure 'params' is not a Promise
-    searchParams: { [key: string]: string | string[] | undefined }; // This should work with dynamic query parameters
+    params: { id: string; type: TransformationTypeKey };
+    searchParams: { [key: string]: string | string[] | undefined };
   };
-  
   
   declare type TransformationFormProps = {
     action: "Add" | "Update";
