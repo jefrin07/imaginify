@@ -20,7 +20,6 @@ if (!cached) {
 
 export const connectToDatabase = async () => {
   if (cached.conn) {
-    console.log('Already connected to MongoDB.');
     return cached.conn;
   }
 
@@ -35,7 +34,6 @@ export const connectToDatabase = async () => {
 
   cached.conn = await cached.promise;
 
-  console.log('Connected to MongoDB:', mongoose.connection.readyState === 1 ? '✅' : '❌');
   
   return cached.conn;
 };
