@@ -1,4 +1,4 @@
-import { currentUser } from '@clerk/nextjs/server';
+import { auth } from "@clerk/nextjs";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 
@@ -9,9 +9,7 @@ import { getUserById } from "@/lib/actions/user.actions";
 
 const Profile = async ({ searchParams }: SearchParamProps) => {
   const page = Number(searchParams?.page) || 1;
-  const curuser = await currentUser();
-  const userId = curuser?.id;
-
+  const { userId } = auth();
 
   if (!userId) redirect("/sign-in");
 

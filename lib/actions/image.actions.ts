@@ -100,70 +100,53 @@ export async function getAllImages({ limit = 9, page = 1, searchQuery = '' }: {
 }) {
   try {
     await connectToDatabase();
-    // Cloudinary Configuration
+
     cloudinary.config({
       cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
       api_key: process.env.CLOUDINARY_API_KEY,
       api_secret: process.env.CLOUDINARY_API_SECRET,
       secure: true,
-    });
+    })
 
     let expression = 'folder=imaginify';
 
     if (searchQuery) {
-      searchQuery = searchQuery.replace(/\s+/g, '+');
-      expression += ` AND ${searchQuery}`;
+      expression += ` AND ${searchQuery}`
     }
 
-
-    // Cloudinary search request
     const { resources } = await cloudinary.search
       .expression(expression)
       .execute();
 
-    // Extract resource IDs
     const resourceIds = resources.map((resource: any) => resource.public_id);
 
     let query = {};
 
-    if (searchQuery) {
-      if (resourceIds.length > 0) {
-        // If resourceIds is not empty, filter by publicId and title
-        query = {
-          publicId: { $in: resourceIds },
-        };
-      } else {
-        // If resourceIds is empty, filter only by title
-        query = {
-          title: { $regex: new RegExp(searchQuery, 'i') },
-        };
+    if(searchQuery) {
+      query = {
+        publicId: {
+          $in: resourceIds
+        }
       }
     }
 
- 
+    const skipAmount = (Number(page) -1) * limit;
 
-    // Skip amount for pagination
-    const skipAmount = (Number(page) - 1) * limit;
-    
     const images = await populateUser(Image.find(query))
       .sort({ updatedAt: -1 })
       .skip(skipAmount)
       .limit(limit);
-
-    // Total count of images matching the query
+    
     const totalImages = await Image.find(query).countDocuments();
-
-    // Total count of saved images
     const savedImages = await Image.find().countDocuments();
 
     return {
       data: JSON.parse(JSON.stringify(images)),
       totalPage: Math.ceil(totalImages / limit),
       savedImages,
-    };
+    }
   } catch (error) {
-    console.error('Error occurred during image retrieval:', error);
-    handleError(error);
+    handleError(error)
   }
 }
 
